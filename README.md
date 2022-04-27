@@ -1,2 +1,2 @@
 # Chess-Project
-just some stuff for my CpE lab final project
+just some stuff for the chess CpE lab final project
