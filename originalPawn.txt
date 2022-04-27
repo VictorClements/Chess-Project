@@ -1,0 +1,45 @@
+
+/*
+Encoding:
+position[2:0] = row
+position[5:3] = column
+color: black = 1, white = 0
+position (0,0) is in top left of board
+position (7,7) is in bottom right of board
+pawn allowable moves: 
+pawnAllow[2] = forward; 
+pawnAllow[1] = diagLeft;
+pawnAllow[0] = diagRight;
+*/
+
+// add in cases to check if pieces are blocking movement
+module pawn(input  logic [5:0] position,
+			input  logic 	   color,
+			output logic [2:0] pawnAllow);
+
+	always_comb
+		case(color)
+			//white pieces
+			1'b0:	begin
+				//determines if possible movements are allowed based only on position
+				if(position[2:0] == 3'b0)									pawnAllow[2] = 1'b0;		//row - 1
+				else														pawnAllow[2] = 1'b1;		//forward
+				if((position[2:0] == 3'b0) | (position[5:3] == 3'b0))		pawnAllow[1] = 1'b0;		//row - 1, column - 1
+				else														pawnAllow[1] = 1'b1;		//diagleft
+				if((position[2:0] == 3'b0) | (position[5:3] == 3'b111))		pawnAllow[0] = 1'b0;		//6'b001_000 - 6'b000_001 (row - 1, column + 1)
+				else														pawnAllow[0] = 1'b1;		//diagright
+			end
+			//black pieces
+			1'b1:	begin
+				//determines if possible movements are allowed based only on position
+				if(position[2:0] == 3'b111)									pawnAllow[2] = 1'b0;		//row + 1
+				else														pawnAllow[2] = 1'b1;		//forward
+				if((position[2:0] == 3'b111) | (position[5:3] == 3'b0))		pawnAllow[1] = 1'b0;		//+ 6'b000_001 - 6'b001_000 (row + 1, column - 1)
+				else														pawnAllow[1] = 1'b1;		//diagleft
+				if((position[2:0] == 3'b111) | (position[5:3] == 3'b111))	pawnAllow[0] = 1'b0;		//row + 1, column + 1
+				else														pawnAllow[0] = 1'b1;		//diagright
+			end
+		endcase
+	
+
+endmodule
