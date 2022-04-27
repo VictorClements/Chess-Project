@@ -14,38 +14,49 @@ rookAllowLeft[2:0]
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
 // bit 2 represets if the space has a king on it, not a king = 0, king = 1 
-module knight(input  logic [2:0] row,
-			        input  logic [2:0] column,
-			        input  logic 	     color,
-			        input  logic [2:0] boardPos [7:0][7:0],
-              output logic [2:0] rookAllowUp, rookAllowRight, rookAllowDown, rookAllowLeft);
+module rook(input  logic [2:0] row,
+						input  logic [2:0] column,
+						input  logic 	     color,
+						input  logic [2:0] boardPos [7:0][7:0],
+						output logic [2:0] rookAllowUp, rookAllowRight, rookAllowDown, rookAllowLeft);
 
-always_comb		begin
+always_comb	begin
 	//determines if possible movements are allowed based on position and other pieces
-	if((row[2:1] == 2'b00) | (column == 3'b000))	knightAllow[0] = 1'b0;	// if in top two rows or leftmost column then cannot go up 2 left 1
-	else if(boardPos[row-2][column-1][1] == color)	knightAllow[0] = 1'b0;	// else if same color piece at up 2 left 1 then cannot go up 2 left 1
-	else					knightAllow[0] = 1'b1;	// else can go up 2 left 1
-	if((row[2:1] == 2'b00) | (column == 3'b111))	knightAllow[1] = 1'b0;	// if in top two rows or rightmost column then cannot go up 2 right 1
-	else if(boardPos[row-2][column+1][1] == color)	knightAllow[1] = 1'b0;	// else if same color piece at up 2 right 1 then cannot go up 2 right 1
-	else					knightAllow[1] = 1'b1;	// else can go up 2 right 1
-	if((row == 3'b000) | (column[2:1] == 2'b11))	knightAllow[2] = 1'b0;	// if in top row or two rightmost columns then cannot go right 2 up 1
-	else if(boardPos[row-1][column+2][1] == color)	knightAllow[2] = 1'b0;	// else if same color piece at right 2 up 1 then cannot go right 2 up 1
-	else					knightAllow[2] = 1'b1;	// else can go right 2 up 1
-	if((row == 3'b111) | (column[2:1] == 2'b11))	knightAllow[3] = 1'b0;	// if in bottom row or two rightmost columns then cannot go right 2 down 1
-	else if(boardPos[row+1][column+2][1] == color)	knightAllow[3] = 1'b0;	// else if same color piece at right 2 down 1 then cannot go right 2 down 1
-	else					knightAllow[3] = 1'b1;	// else can go right 2 down 1
-	if((row[2:1] == 2'b11) | (column == 3'b111))	knightAllow[4] = 1'b0;	// if in bottom two rows or rightmost column then cannot go down 2 right 1
-	else if(boardPos[row+2][column+1][1] == color)	knightAllow[4] = 1'b0;	// else if same color piece at down 2 right 1 then cannot go down 2 right 1
-	else					knightAllow[4] = 1'b1;	// else can go down 2 right 1
-	if((row[2:1] == 2'b11) | (column == 3'b000))	knightAllow[5] = 1'b0;	// if in bottom two rows or leftmost column then cannot go down 2 left 1
-	else if(boardPos[row+2][column-1][1] == color)	knightAllow[5] = 1'b0;	// else if same color piece at down 2 left 1 then cannot go down 2 left 1
-	else					knightAllow[5] = 1'b1;	// else can go down 2 left 1
-	if((row == 3'b111) | (column[2:1] == 2'b00))	knightAllow[6] = 1'b0;	// if in bottom row or two leftmost columns then cannot go left 2 down 1
-	else if(boardPos[row+1][column-2][1] == color)	knightAllow[6] = 1'b0;	// else if same color piece at left 2 down 1 then cannot go left 2 down 1
-	else					knightAllow[6] = 1'b1;	// else can go left 2 down 1
-	if((row == 3'b000) | (column[2:1] == 2'b00))	knightAllow[7] = 1'b0;	// if in top row or two leftmost columns then cannot go left 2 up 1
-	else if(boardPos[row+1][column-2][1] == color)	knightAllow[7] = 1'b0;	// else if same color piece at left 2 up 1 then cannot go left 2 up 1
-	else					knightAllow[7] = 1'b1;	// else can go left 2 up 1
+	//not sure if row will be counted as signed or unsigned number, perhaps change comparisons to account for that
+	//also unsure if rookAllow = i - 1 will work properly, since the number of bits of i - 1 is not specified and we are storing it into a 3 bit logic variable
+	
+	// rookAllowUp
+	for(int i = 1; i < 9; i++)	begin																						// iterates i from 1 to 8 and executes if conditional each time
+		if((row < i) | (boardPos[row - i][column][1:0] == {color, 1'b1}))	begin 	// checks if row is less than i, or if boardPos "i" units above rook has a piece and is the same color as the rook
+			rookAllowUp = i - 1;																										// set allowed distance of rook moving up to be i - 1
+			break;																																	// break from for loop
+		end
+	end
+	
+	// rookAllowRight
+	for(int i = 1; i < 9; i++)	begin																									// iterates i from 1 to 8 and executes if conditional each time
+		if((column > 7 - i) | (boardPos[row][column + i][1:0] == {color, 1'b1}))	begin // checks if column is greater than 7 - i, or if boardPos "i" units right of rook has a piece and is the same color as the rook
+			rookAllowRight = i - 1;																												// set allowed distance of rook moving right to be i - 1
+			break;																																				// break from for loop
+		end
+	end
+	
+	// rookAllowDown
+	for(int i = 1; i < 9; i++)	begin																								// iterates i from 1 to 8 and executes if conditional each time
+		if((row > 7 - i) | (boardPos[row + i][column][1:0] == {color, 1'b1}))	begin 	// checks if row is greater than 7 - i, or if boardPos "i" units below rook has a piece and is the same color as the rook
+			rookAllowDown = i - 1;																											// set allowed distance of rook moving down to be i - 1
+			break;																																			// break from for loop
+		end
+	end
+	
+	// rookAllowLeft
+	for(int i = 1; i < 9; i++)	begin																								// iterates i from 1 to 8 and executes if conditional each time
+		if((column < i) | (boardPos[row][column - i][1:0] == {color, 1'b1}))	begin 	// checks if column is less than i, or if boardPos "i" units left of rook has a piece and is the same color as the rook
+			rookAllowLeft = i - 1;																											// set allowed distance of rook moving left to be i - 1
+			break;																																			// break from for loop
+		end
+	end
+	
 end
 
 endmodule
