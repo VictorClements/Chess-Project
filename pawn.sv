@@ -14,10 +14,10 @@ pawnAllow[0] = diagRight;
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
 // bit 2 represets if the space has a king on it, not a king = 0, king = 1 
 module pawn(input  logic [2:0] row,
-			input  logic [2:0] column,
-			input  logic 	   color,
-			input  logic [2:0] boardPos [7:0][7:0],
-			output logic [2:0] pawnAllow);
+						input  logic [2:0] column,
+						input  logic 	   	 color,
+						input  logic [2:0] boardPos [7:0][7:0],
+						output logic [2:0] pawnAllow);
 
 //put boardpos checks in else if
 	always_comb
