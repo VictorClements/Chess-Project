@@ -75,22 +75,34 @@ module vgaController #(parameter HBP     = 10'd48,   // horizontal back porch
 endmodule 
 
 
-module videoGen(input logic [9:0] x, y, output logic [7:0] r, g, b); 
+module videoGen(input  logic [9:0] x, y,
+		//input  logic [2:0] boardPos [7:0][7:0],
+		output logic [7:0] r, g, b); 
 
-  logic pixel, inrect; 
+  logic pixel, whiteSqr, blackSqr 
   
   // given y position, choose a character to display 
   // then look up the pixel value from the character ROM 
   // and display it in red or blue. Also draw a green rectangle. 
-  chargenrom chargenromb(y[8:3]+8'd65, x[2:0], y[2:0], pixel); 
-  rectgen rectgen(x, y, 10'd120, 10'd150, 10'd200, 10'd230, inrect); 
+	//chargenrom chargenromb(y[8:3]+8'd65, x[2:0], y[2:0], pixel); 		//change
+	
+
+	rectgen boardgen(x, y, 10'd80, 10'd0, 10'd560, 10'd480, whiteSqr, blackSqr); 	//change
   
-  assign {r, b} = (y[3]==0) ? {{8{pixel}},8'h00} : {8'h00, {8{pixel}}}; 
-  assign g      = inrect    ? 8'hFF : 8'h00;  
+	always_comb	begin
+		case({whiteSqr, blackSqr})
+			2'b01:		{r, b, g} = 24'h769656;	//dark green color for black squares
+			2'b10:		{r, b, g} = 24'hEEEED2;	//light tan color for white squares
+			default:	{r, b, g} = 24'h000000;	//all other pixels will be black
+		endcase
+	end
+
+	//assign {r, b} = (y[3]==0) ? {{8{pixel}},8'h00} : {8'h00, {8{pixel}}}; 	//change
+  	//assign g      = inrect    ? 8'hFF : 8'h00;  				//change
 
 endmodule
 
-
+/*
 module chargenrom(input  logic [7:0] ch, 
                   input  logic [2:0] xoff, yoff,  
                   output logic       pixel); 
@@ -108,12 +120,35 @@ module chargenrom(input  logic [7:0] ch,
   assign pixel = line[3'd7-xoff]; 
   
 endmodule 
+*/
+module boardgen(input  logic [9:0] x, y, left, top, right, bot, 
+                output logic 	   white, black);
 
-module rectgen(input  logic [9:0] x, y, left, top, right, bot, 
-               output logic inrect);
-			   
-  assign inrect = (x >= left & x < right & y >= top & y < bot); 
-  
+	logic exit;
+	
+	always_comb	begin
+		for(int i = 0; i < 8, i++)	begin
+			for(int j = 0; j < 8; j++)	begin
+				if ( (x >= (left + (j * 10'd60))) & (x < (left + ((j + 1) * 10'd60))) & (y >= (top + (i * 10'd60))) & (y < (top + ((i+1) * 10'd60))) ) begin
+					if( ((i + j) % 2) == 0)		begin	
+						white = 1'b1;
+						black = 1'b0;
+						exit = 1'b1;
+						break;
+					end
+					else if( ((i+j) % 2) == 1)	begin
+						white = 1'b0;
+						black = 1'b1;
+						exit = 1'b1;
+						break;
+					end
+				end
+			end
+			if(exit == 1'b1)	break;
+		end
+		if(exit == 1'b0)	begin
+			white = 1'b0;
+			black = 1'b0;
+		end
+	end
 endmodule 
-
-
