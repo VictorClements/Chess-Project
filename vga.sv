@@ -79,7 +79,7 @@ module videoGen(input  logic [9:0] x, y,
 		//input  logic [2:0] boardPos [7:0][7:0],
 		output logic [7:0] r, g, b); 
 
-  logic pixel, whiteSqr, blackSqr 
+  logic pixel, whiteSqr, blackSqr;
   
   // given y position, choose a character to display 
   // then look up the pixel value from the character ROM 
