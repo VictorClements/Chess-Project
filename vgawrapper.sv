@@ -1,7 +1,7 @@
 // DE2-115 wrapper
 
 
-module vgawrapper(input  logic       CLOCK_50,
+module vga_wrapper(input  logic       CLOCK_50,
                   input  logic [0:0] SW,
                   output logic       VGA_CLK, 
                   output logic       VGA_HS,
