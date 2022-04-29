@@ -28,7 +28,7 @@ module queen(input  logic [2:0] row,
 always_comb	begin
 	// determines if possible movements are allowed based on position and other pieces
 	// not sure if row will be counted as signed or unsigned number, perhaps change comparisons to account for that
-	// also unsure if bishopAllow = i - 1 will work properly, since the number of bits of i - 1 is not specified and we are storing it into a 3 bit logic variable
+	// also unsure if queenAllow = i - 1 will work properly, since the number of bits of i - 1 is not specified and we are storing it into a 3 bit logic variable. maybe do "queenAllow = 3'd(i - 1)" ? 
 	
 	// queenAllowUp
 	for(int i = 1; i < 9; i++)	begin																						// iterates i from 1 to 8 and executes if conditional each time
