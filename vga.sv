@@ -127,7 +127,7 @@ module boardgen(input  logic [9:0] x, y, left, top, right, bot,
 	logic exit;
 	
 	always_comb	begin
-		for(int i = 0; i < 8, i++)	begin
+		for(int i = 0; i < 8; i++)	begin
 			for(int j = 0; j < 8; j++)	begin
 				if ( (x >= (left + (j * 10'd60))) & (x < (left + ((j + 1) * 10'd60))) & (y >= (top + (i * 10'd60))) & (y < (top + ((i+1) * 10'd60))) ) begin
 					if( ((i + j) % 2) == 0)		begin	
