@@ -87,7 +87,7 @@ module videoGen(input  logic [9:0] x, y,
 	//chargenrom chargenromb(y[8:3]+8'd65, x[2:0], y[2:0], pixel); 		//change
 	
 
-	rectgen boardgen(x, y, 10'd80, 10'd0, 10'd560, 10'd480, whiteSqr, blackSqr); 	//change
+	boardgen boardgen(x, y, 10'd80, 10'd0, 10'd560, 10'd480, whiteSqr, blackSqr); 	//change
   
 	always_comb	begin
 		case({whiteSqr, blackSqr})
