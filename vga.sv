@@ -80,7 +80,7 @@ module videoGen(input  logic [9:0] x, y,
 		output logic [7:0] r, g, b); 
 
 	logic		pixel;
-	logic	[3:0] 	PositionInfo;	//bit 3: off of board, bit 2: Piece color, bit 1: Square color, bit 0: square is empty or not
+	logic	[3:0] 	positionInfo;	//bit 1: off of the board, bit 0: color of square
 	
   
   // given y position, choose a character to display 
@@ -92,9 +92,10 @@ module videoGen(input  logic [9:0] x, y,
 	boardgen boardgen(x, y, boardPos, positionInfo); 	//change
   
 	always_comb	begin
-		case(positionInfo)
-			4'b01:				//{r, b, g} = 24'h769656;	//dark green color for black squares
-			4'b10:				//{r, b, g} = 24'hEEEED2;	//light tan color for white squares
+		casez(positionInfo)
+							//{r, b, g} = 24'h769656;	//dark green color for black squares
+							//{r, b, g} = 24'hEEEED2;	//light tan color for white squares
+			
 			default:			//{r, b, g} = 24'h000000;	//all other pixels will be black
 		endcase
 	end
@@ -123,212 +124,154 @@ module chargenrom(input  logic [7:0] ch,
   
 endmodule 
 */
+// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 3 bit value
+// bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
+// bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
+// bit 2 represets if the space has a king on it, not a king = 0, king = 1 
 module boardgen(input  logic [9:0] x, y,
 		input  logic [2:0] boardPos [7:0][7:0],
-		output logic [2:0] positionInfo);
+		output logic [3:0] positionInfo);		//bit 1: off of the board, bit 0: color of square (0 = white, 1 = black)
 
 	always_comb	begin
 		//first row
-		if( (x >= 80) & (x < 140) & (y >= 0) & (y < 60) )	begin
-			if(boardPos)
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 0) & (y < 60) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 0) & (y < 60) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 0) & (y < 60) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 0) & (y < 60) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 0) & (y < 60) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 0) & (y < 60) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 0) & (y < 60) )	begin
-
-		end
+		if( (x >= 80) & (x < 140) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b00, boardPos[0][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b01, boardPos[0][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b00, boardPos[0][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b01, boardPos[0][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b00, boardPos[0][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b01, boardPos[0][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b00, boardPos[0][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 0) & (y < 60) )
+			positionInfo = {2'b01, boardPos[0][7][1:0]};
 		//second row
-		else if( (x >= 80) & (x < 140) & (y >= 60) & (y < 120) )	begin
-
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 60) & (y < 120) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 60) & (y < 120) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 60) & (y < 120) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 60) & (y < 120) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 60) & (y < 120) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 60) & (y < 120) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 60) & (y < 120) )	begin
-
-		end
+		else if( (x >= 80) & (x < 140) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b01, boardPos[1][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b00, boardPos[1][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b01, boardPos[1][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b00, boardPos[1][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b01, boardPos[1][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b00, boardPos[1][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b01, boardPos[1][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 60) & (y < 120) )
+			positionInfo = {2'b00, boardPos[1][7][1:0]};
 		//third row
-		else if( (x >= 80) & (x < 140) & (y >= 120) & (y < 180) )	begin
-
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 120) & (y < 180) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 120) & (y < 180) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 120) & (y < 180) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 120) & (y < 180) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 120) & (y < 180) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 120) & (y < 180) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 120) & (y < 180) )	begin
-
-		end
+		else if( (x >= 80) & (x < 140) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b00, boardPos[2][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b01, boardPos[2][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b00, boardPos[2][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b01, boardPos[2][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b00, boardPos[2][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b01, boardPos[2][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b00, boardPos[2][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 120) & (y < 180) )
+			positionInfo = {2'b01, boardPos[2][7][1:0]};
 		//fouth row
-		else if( (x >= 80) & (x < 140) & (y >= 180) & (y < 240) )	begin
-
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 180) & (y < 240) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 180) & (y < 240) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 180) & (y < 240) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 180) & (y < 240) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 180) & (y < 240) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 180) & (y < 240) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 180) & (y < 240) )	begin
-
-		end
-
+		else if( (x >= 80) & (x < 140) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b01, boardPos[3][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b00, boardPos[3][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b01, boardPos[3][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b00, boardPos[3][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b01, boardPos[3][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b00, boardPos[3][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b01, boardPos[3][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 180) & (y < 240) )
+			positionInfo = {2'b00, boardPos[3][7][1:0]};
 		//fifth row
-		else if( (x >= 80) & (x < 140) & (y >= 240) & (y < 300) )	begin
-
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 240) & (y < 300) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 240) & (y < 300) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 240) & (y < 300) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 240) & (y < 300) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 240) & (y < 300) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 240) & (y < 300) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 240) & (y < 300) )	begin
-
-		end
+		else if( (x >= 80) & (x < 140) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b00, boardPos[4][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b01, boardPos[4][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b00, boardPos[4][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b01, boardPos[4][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b00, boardPos[4][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b01, boardPos[4][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b00, boardPos[4][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 240) & (y < 300) )
+			positionInfo = {2'b01, boardPos[4][7][1:0]};
 		//sixth row
-		else if( (x >= 80) & (x < 140) & (y >= 300) & (y < 360) )	begin
-
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 300) & (y < 360) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 300) & (y < 360) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 300) & (y < 360) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 300) & (y < 360) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 300) & (y < 360) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 300) & (y < 360) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 300) & (y < 360) )	begin
-
-		end	
+		else if( (x >= 80) & (x < 140) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b01, boardPos[5][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b00, boardPos[5][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b01, boardPos[5][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b00, boardPos[5][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b01, boardPos[5][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b00, boardPos[5][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b01, boardPos[5][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 300) & (y < 360) )
+			positionInfo = {2'b00, boardPos[5][7][1:0]};
 		//seventh row
-		else if( (x >= 80) & (x < 140) & (y >= 360) & (y < 420) )	begin
-
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 360) & (y < 420) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 360) & (y < 420) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 360) & (y < 420) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 360) & (y < 420) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 360) & (y < 420) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 360) & (y < 420) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 360) & (y < 420) )	begin
-
-		end
+		else if( (x >= 80) & (x < 140) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b00, boardPos[6][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b01, boardPos[6][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b00, boardPos[6][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b01, boardPos[6][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b00, boardPos[6][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b01, boardPos[6][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b00, boardPos[6][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 360) & (y < 420) )
+			positionInfo = {2'b01, boardPos[6][7][1:0]};
 		//eighth row
-		else if( (x >= 80) & (x < 140) & (y >= 420) & (y < 480) )	begin
-
-		end
-		else if( (x >= 140) & (x < 200) & (y >= 420) & (y < 480) )	begin
-
-		end
-		else if( (x >= 200) & (x < 260) & (y >= 420) & (y < 480) )	begin
-
-		end
-		else if( (x >= 260) & (x < 320) & (y >= 420) & (y < 480) )	begin
-
-		end
-		else if( (x >= 320) & (x < 380) & (y >= 420) & (y < 480) )	begin
-
-		end
-		else if( (x >= 380) & (x < 440) & (y >= 420) & (y < 480) )	begin
-
-		end
-		else if( (x >= 440) & (x < 500) & (y >= 420) & (y < 480) )	begin
-
-		end
-		else if( (x >= 500) & (x < 560) & (y >= 420) & (y < 480) )	begin
-
-		end
+		else if( (x >= 80) & (x < 140) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b01, boardPos[7][0][1:0]};
+		else if( (x >= 140) & (x < 200) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b00, boardPos[7][1][1:0]};
+		else if( (x >= 200) & (x < 260) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b01, boardPos[7][2][1:0]};
+		else if( (x >= 260) & (x < 320) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b00, boardPos[7][3][1:0]};
+		else if( (x >= 320) & (x < 380) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b01, boardPos[7][4][1:0]};
+		else if( (x >= 380) & (x < 440) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b00, boardPos[7][5][1:0]};
+		else if( (x >= 440) & (x < 500) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b01, boardPos[7][6][1:0]};
+		else if( (x >= 500) & (x < 560) & (y >= 420) & (y < 480) )
+			positionInfo = {2'b00, boardPos[7][7][1:0]};
+		//when out of x and y bounds
+		else
+			positionInfo = 2'b11;
 	end
 endmodule 
 /*
