@@ -79,7 +79,9 @@ module videoGen(input  logic [9:0] x, y,
 		//input  logic [2:0] boardPos [7:0][7:0],
 		output logic [7:0] r, g, b); 
 
-  logic pixel, whiteSqr, blackSqr;
+	logic		pixel;
+	logic	[3:0] 	PositionInfo;	//bit 3: off of board, bit 2: Piece color, bit 1: Square color, bit 0: square is empty or not
+	
   
   // given y position, choose a character to display 
   // then look up the pixel value from the character ROM 
@@ -87,13 +89,13 @@ module videoGen(input  logic [9:0] x, y,
 	//chargenrom chargenromb(y[8:3]+8'd65, x[2:0], y[2:0], pixel); 		//change
 	
 
-	boardgen boardgen(x, y, 10'd80, 10'd0, 10'd560, 10'd480, whiteSqr, blackSqr); 	//change
+	boardgen boardgen(x, y, positionInfo); 	//change
   
 	always_comb	begin
-		case({whiteSqr, blackSqr})
-			2'b01:		{r, b, g} = 24'h769656;	//dark green color for black squares
-			2'b10:		{r, b, g} = 24'hEEEED2;	//light tan color for white squares
-			default:	{r, b, g} = 24'h000000;	//all other pixels will be black
+		case(positionInfo)
+			4'b01:				//{r, b, g} = 24'h769656;	//dark green color for black squares
+			4'b10:				//{r, b, g} = 24'hEEEED2;	//light tan color for white squares
+			default:			//{r, b, g} = 24'h000000;	//all other pixels will be black
 		endcase
 	end
 
@@ -107,8 +109,8 @@ module chargenrom(input  logic [7:0] ch,
                   input  logic [2:0] xoff, yoff,  
                   output logic       pixel); 
 
-  logic [5:0] charrom[2047:0]; // character generator ROM 
-  logic [7:0] line;            // a line read from the ROM 
+  logic [59:0] charrom[2047:0]; // character generator ROM 
+  logic [59:0] line;            // a line read from the ROM 
 
   // initialize ROM with characters from text file 
   initial $readmemb("charrom.txt", charrom); 
@@ -121,10 +123,140 @@ module chargenrom(input  logic [7:0] ch,
   
 endmodule 
 */
-module boardgen(input  logic [9:0] x, y, left, top, right, bot, 
-                output logic 	   white, black);
+module boardgen(input  logic [9:0] x, y,
+		output logic [2:0] positionInfo);
 
-	logic exit;
+	always_comb	begin
+		//first row
+		if( (x >= 80) & (x < 140) & (y >= 0) & (y < 60) )	begin
+			positionInfo = 3'b
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 0) & (y < 60) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 0) & (y < 60) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 0) & (y < 60) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 0) & (y < 60) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 0) & (y < 60) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 0) & (y < 60) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 0) & (y < 60) )	begin
+
+		end
+		//second row
+		else if( (x >= 80) & (x < 140) & (y >= 60) & (y < 120) )	begin
+
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 60) & (y < 120) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 60) & (y < 120) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 60) & (y < 120) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 60) & (y < 120) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 60) & (y < 120) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 60) & (y < 120) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 60) & (y < 120) )	begin
+
+		end
+		//third row
+		else if( (x >= 80) & (x < 140) & (y >= 120) & (y < 180) )	begin
+
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 120) & (y < 180) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 120) & (y < 180) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 120) & (y < 180) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 120) & (y < 180) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 120) & (y < 180) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 120) & (y < 180) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 120) & (y < 180) )	begin
+
+		end
+		//fouth row
+		else if( (x >= 80) & (x < 140) & (y >= 180) & (y < 240) )	begin
+
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 180) & (y < 240) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 180) & (y < 240) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 180) & (y < 240) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 180) & (y < 240) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 180) & (y < 240) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 180) & (y < 240) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 180) & (y < 240) )	begin
+
+		end
+
+		//fifth row
+		else if( (x >= 80) & (x < 140) & (y >= 240) & (y < 300) )	begin
+
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 240) & (y < 300) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 240) & (y < 300) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 240) & (y < 300) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 240) & (y < 300) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 240) & (y < 300) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 240) & (y < 300) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 240) & (y < 300) )	begin
+
+		end	
+	end
+endmodule 
+/*
+logic exit;
 	
 	always_comb	begin
 		for(int i = 0; i < 8; i++)	begin
@@ -151,4 +283,4 @@ module boardgen(input  logic [9:0] x, y, left, top, right, bot,
 			black = 1'b0;
 		end
 	end
-endmodule 
+	*/
