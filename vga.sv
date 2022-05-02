@@ -76,7 +76,7 @@ endmodule
 
 
 module videoGen(input  logic [9:0] x, y,
-		//input  logic [2:0] boardPos [7:0][7:0],
+		input  logic [2:0] boardPos [7:0][7:0],
 		output logic [7:0] r, g, b); 
 
 	logic		pixel;
@@ -89,7 +89,7 @@ module videoGen(input  logic [9:0] x, y,
 	//chargenrom chargenromb(y[8:3]+8'd65, x[2:0], y[2:0], pixel); 		//change
 	
 
-	boardgen boardgen(x, y, positionInfo); 	//change
+	boardgen boardgen(x, y, boardPos, positionInfo); 	//change
   
 	always_comb	begin
 		case(positionInfo)
@@ -124,12 +124,13 @@ module chargenrom(input  logic [7:0] ch,
 endmodule 
 */
 module boardgen(input  logic [9:0] x, y,
+		input  logic [2:0] boardPos [7:0][7:0],
 		output logic [2:0] positionInfo);
 
 	always_comb	begin
 		//first row
 		if( (x >= 80) & (x < 140) & (y >= 0) & (y < 60) )	begin
-			positionInfo = 3'b
+			if(boardPos)
 		end
 		else if( (x >= 140) & (x < 200) & (y >= 0) & (y < 60) )	begin
 
@@ -252,7 +253,82 @@ module boardgen(input  logic [9:0] x, y,
 		end
 		else if( (x >= 500) & (x < 560) & (y >= 240) & (y < 300) )	begin
 
+		end
+		//sixth row
+		else if( (x >= 80) & (x < 140) & (y >= 300) & (y < 360) )	begin
+
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 300) & (y < 360) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 300) & (y < 360) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 300) & (y < 360) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 300) & (y < 360) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 300) & (y < 360) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 300) & (y < 360) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 300) & (y < 360) )	begin
+
 		end	
+		//seventh row
+		else if( (x >= 80) & (x < 140) & (y >= 360) & (y < 420) )	begin
+
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 360) & (y < 420) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 360) & (y < 420) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 360) & (y < 420) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 360) & (y < 420) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 360) & (y < 420) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 360) & (y < 420) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 360) & (y < 420) )	begin
+
+		end
+		//eighth row
+		else if( (x >= 80) & (x < 140) & (y >= 420) & (y < 480) )	begin
+
+		end
+		else if( (x >= 140) & (x < 200) & (y >= 420) & (y < 480) )	begin
+
+		end
+		else if( (x >= 200) & (x < 260) & (y >= 420) & (y < 480) )	begin
+
+		end
+		else if( (x >= 260) & (x < 320) & (y >= 420) & (y < 480) )	begin
+
+		end
+		else if( (x >= 320) & (x < 380) & (y >= 420) & (y < 480) )	begin
+
+		end
+		else if( (x >= 380) & (x < 440) & (y >= 420) & (y < 480) )	begin
+
+		end
+		else if( (x >= 440) & (x < 500) & (y >= 420) & (y < 480) )	begin
+
+		end
+		else if( (x >= 500) & (x < 560) & (y >= 420) & (y < 480) )	begin
+
+		end
 	end
 endmodule 
 /*
