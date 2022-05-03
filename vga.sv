@@ -80,7 +80,7 @@ module videoGen(input  logic [9:0] x, y,
 		output logic [7:0] r, g, b); 
 
 	logic		pixel;
-	logic	[3:0] 	positionInfo;	//bit 1: off of the board, bit 0: color of square
+	logic	[3:0] 	positionInfo;	//bit 3: off of the board, bit 2: color of square bit 1: color of piece, bit 0: if piece on space
 	
   
   // given y position, choose a character to display 
@@ -90,13 +90,14 @@ module videoGen(input  logic [9:0] x, y,
 	
 
 	boardgen boardgen(x, y, boardPos, positionInfo); 	//change
-  
+  				//{r, b, g} = 24'h769656;	//dark green color for black squares
+				//{r, b, g} = 24'hEEEED2;	//light tan color for white squares
 	always_comb	begin
 		casez(positionInfo)
-							//{r, b, g} = 24'h769656;	//dark green color for black squares
-							//{r, b, g} = 24'hEEEED2;	//light tan color for white squares
-			
-			default:			//{r, b, g} = 24'h000000;	//all other pixels will be black
+			4'b1???:	{r, b, g} = 24'h000000; //if off the board, pixels will be black	
+			4'b01??:	{r, b, g} = 24'h769656;
+			4'b00??:	{r, b, g} = 24'hEEEED2;
+			default:	{r, b, g} = 24'h000000;	//all other pixels will be black
 		endcase
 	end
 
@@ -105,7 +106,27 @@ module videoGen(input  logic [9:0] x, y,
 
 endmodule
 
-/*
+/*	//altered
+module chargenrom(input  logic [7:0] ch, 
+                  input  logic [2:0] xoff, yoff,  
+                  output logic       pixel); 
+
+  logic [59:0] charrom[2047:0]; // character generator ROM 
+  logic [59:0] line;            // a line read from the ROM 
+
+  // initialize ROM with characters from text file 
+  initial $readmemb("charrom.txt", charrom); 
+
+  // index into ROM to find line of character 
+  assign line = charrom[yoff+{ch-65, 3'b000}];  // subtract 65 because A 
+                                                // is entry 0 
+  // reverse order of bits 
+  assign pixel = line[3'd7-xoff]; 
+  
+endmodule 
+*/
+
+/*	//original (except for the 59 part)
 module chargenrom(input  logic [7:0] ch, 
                   input  logic [2:0] xoff, yoff,  
                   output logic       pixel); 
