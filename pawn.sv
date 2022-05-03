@@ -9,15 +9,15 @@ pawnAllow[1] = diagLeft;
 pawnAllow[0] = diagRight;
 */
 
-// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 3 bit value
+// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
-// bit 2 represets if the space has a king on it, not a king = 0, king = 1 
+// bits 4:2 represent piece type =>	000: Pawn, 001: knight, 010: bishop, 011: rook, 100: queen, 111: king
 module pawn(input  logic [2:0] row,
-						input  logic [2:0] column,
-						input  logic 	   	 color,
-						input  logic [2:0] boardPos [7:0][7:0],
-						output logic [2:0] pawnAllow);
+	    input  logic [2:0] column,
+	    input  logic       color,
+	    input  logic [2:0] boardPos [7:0][7:0],
+	    output logic [4:0] pawnAllow);
 
 	always_comb
 		case(color)			//determines if possible movements are allowed based on position and other pieces
