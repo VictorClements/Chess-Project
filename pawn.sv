@@ -16,7 +16,7 @@ module pawn(input  logic [2:0] row,
 	    input  logic [2:0] column,
 	    input  logic       color,
 	    input  logic [4:0] boardPos [7:0][7:0],
-	    output logic [4:0] pawnAllow);
+	    output logic [2:0] pawnAllow);
 
 	always_comb
 		case(color)			//determines if possible movements are allowed based on position and other pieces
