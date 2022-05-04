@@ -14,28 +14,56 @@ kingAllow[1] = left;
 kingAllow[0] = upLeft;
 */
 
-// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 3 bit value
+// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
-// bit 2 represets if the space has a king on it, not a king = 0, king = 1 
-module pawn(input  logic [2:0] row,
+// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 N/A
+module king(input  logic [2:0] row,
 						input  logic [2:0] column,
 						input  logic 	   	 color,
 						input  logic [2:0] boardPos [7:0][7:0],
             output logic [7:0] kingAllow);
 
-	always_comb begin//determines if possible movements are allowed based on position and other pieces
+	always_comb begin	//determines if possible movements are allowed based on position and other pieces (not finished yet)
     
-		if((row == 3'b0))																																						pawnAllow[2] = 1'b0;	// if in top row cannot move forward
-		else if(boardPos[row-1][column][0] == 1'b1)																									pawnAllow[2] = 1'b0;	// if there is a piece in row above of pawn, cannot move forward
-		else																																												pawnAllow[2] = 1'b1;	// can move forward
-				
-		if((row == 3'b0) | (column == 3'b0))																												pawnAllow[1] = 1'b0;	// if in top row, or in leftmost column cannot move diagonally left
-		else if((boardPos[row-1][column-1][0] == 1'b0) | (boardPos[row-1][column-1][1:0] == 2'b01))	pawnAllow[1] = 1'b0;	// if there is no piece diagonally to the left, or if there is a white piece diagonally to the left, cannot move diagonally left
-		else																																												pawnAllow[1] = 1'b1;	// can move diagleft
-				
-		if((row == 3'b0) | (column == 3'b111))																											pawnAllow[0] = 1'b0;	// if in top row, or in rightmost column cannot move diagonally right
-		else if((boardPos[row-1][column+1][0] == 1'b0) | (boardPos[row-1][column+1][1:0] == 2'b01))	pawnAllow[0] = 1'b0;	// if there is no piece diagonally to the right, or if there is a white piece diagonally to the right, cannot move diagonally right
-		else																																												pawnAllow[0] = 1'b1;	// can move diagright
+		//up
+		if(row == 3'b0)																																							kingAllow[7] = 1'b0;	// if in top row cannot move up
+		else if(boardPos[row-1][column][1:0] == {color, 1'b1})																			kingAllow[7] = 1'b0;	// if there is a same colored piece in row above of king, cannot move up
+		else																																												kingAllow[7] = 1'b1;	// can move up
+		
+		//upRight
+		if((row == 3'b0) | (column == 3'b111))																											kingAllow[6] = 1'b0;	// if in top row, or in rightmost column cannot move upRight
+		else if(boardPos[row-1][column+1][1:0] == {color, 1'b1})																		kingAllow[6] = 1'b0;	// if there is a same colored piece up and right, cannot move upRight
+		else																																												kingAllow[6] = 1'b1;	// can move upRight
+		
+		//right
+		if(column == 3'b111)																																				kingAllow[5] = 1'b0;	// if in rightmost column cannot move right
+		else if(boardPos[row][column+1][0] == {color, 1'b1})																				kingAllow[5] = 1'b0;	// if there is a same colored piece in column right of king, cannot move right
+		else																																												kingAllow[5] = 1'b1;	// can move right
+		
+		//downRight
+		if((row == 3'b111) | (column == 3'b111))																										kingAllow[4] = 1'b0;	// if in bottom row, or in rightmost column cannot move downRight
+		else if(boardPos[row+1][column+1][1:0] == {color, 1'b1})																		kingAllow[4] = 1'b0;	// if there is a same colored piece down and right of king, cannot move downRight
+		else																																												kingAllow[4] = 1'b1;	// can move downRight
+
+		//down
+		if(row == 3'b111)																																						kingAllow[3] = 1'b0;	// if in bottom row cannot move down
+		else if(boardPos[row+1][column][1:0] == {color, 1'b1})																			kingAllow[3] = 1'b0;	// if there is a same colored piece in row below of king, cannot move down
+		else																																												kingAllow[3] = 1'b1;	// can move down
+		
+		//downLeft
+		if((row == 3'b111) | (column == 3'b0))																											kingAllow[2] = 1'b0;	// if in bottom row, or in leftmost column cannot move downLeft
+		else if(boardPos[row+1][column-1][1:0] == {color, 1'b1})																		kingAllow[2] = 1'b0;	// if there is a same colored piece down and left, cannot move downLeft
+		else																																												kingAllow[2] = 1'b1;	// can move downLeft
+		
+		//left
+		if(column == 3'b0)																																					kingAllow[1] = 1'b0;	// if in leftmost column cannot move left
+		else if(boardPos[row][column-1][0] == {color, 1'b1})																				kingAllow[1] = 1'b0;	// if there is a same colored piece in column left of king, cannot move left
+		else																																												kingAllow[1] = 1'b1;	// can move left
+		
+		//upLeft
+		if((row == 3'b0) | (column == 3'b0))																												kingAllow[0] = 1'b0;	// if in top row, or in leftmost column cannot move upLeft
+		else if(boardPos[row-1][column-1][1:0] == {color, 1'b1})																		kingAllow[0] = 1'b0;	// if there is a same colored piece down and left of king, cannot move downLeft
+		else																																												kingAllow[0] = 1'b1;	// can move downLeft
   end
 endmodule
