@@ -14,10 +14,10 @@ knightAllow[6] = left  2  down  1
 knightAllow[7] = left  2  up    1
 */
 
-// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 3 bit value
+// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
-// bit 2 represets if the space has a king on it, not a king = 0, king = 1 
+// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 N/A
 module knight(input  logic [2:0] row,
 			  input  logic [2:0] column,
 			  input  logic 	     color,
