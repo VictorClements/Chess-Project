@@ -68,8 +68,10 @@ always_ff @(posedge reset)	begin
 
 */
 
-module chess(input  logic	clk, reset,
-	     input  logic [3:0]	cursor,
+module chess(input  logic	clk, reset,	//clk and reset for system 
+	     input  logic 	rowChange, columnChange,
+	     input  logic	UP,
+	     
 	     output logic [6:0]	rowDisplay, columnDisplay,
 	     output logic	vgaclk,
 	     output logic	hsync, vsync,
@@ -79,10 +81,12 @@ module chess(input  logic	clk, reset,
 // boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
-// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 N/A
-
+// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 N/A	
+	
   logic [4:0] boardPos [7:0][7:0];
   initial $readmemb("start.txt", boardPos);
+	
+  positionCounter myPos(rowChange, columnChange, reset, UP, rowDisplay, columnDisplay);
 
 endmodule
 
