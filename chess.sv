@@ -92,7 +92,7 @@ module chess(input  logic	clk, reset,	//clk and reset for system
   initial $readmemb("start.txt", boardPos);	// initialize boardPos array to starting chess piece placements
 	
   positionCounter myPos(rowChange, columnChange, reset, UP, rowNum, columnNum, rowDisplay, columnDisplay);	// input for cursor
-	//vga myvga(insert stuff here);  //output for cga display
+  vga myvga(clk, reset, boardPos, vgaclk, hsync, vsync, sync_b, blank_b, r, g, b);  				//output for vga display
 	always_ff @(posedge select) 	begin	//when the select button is pressed
 		selectedPiece <= boardPos[rowNum][columnNum][4:0];	//assign selectedPiece the current position info
 		originalRow <= rowNum;					//record this original row
@@ -101,7 +101,7 @@ module chess(input  logic	clk, reset,	//clk and reset for system
 	end
 	
 	always_ff @(posedge place)	begin	//when the place button is pressed
-		matchAllowedMoves matches(selectedPiece, moves, match);		//instantiate matchAllowedMoves module to see if attempted move matches allowed moves
+		matchAllowedMoves matches(selectedPiece, moves, originalRow, originalColumn, rowNum, columnNum, match);		//instantiate matchAllowedMoves module to see if attempted move matches allowed moves
 		if(match) begin							//if match is true
 			boardPos[rowNum][columnNum][4:0] = selectedPiece;	//move piece to new position
 			boardPos[originalRow][origininalColumn][4:0] = 5'b0;	//reset original position to no picee
@@ -137,9 +137,10 @@ module pawnMatch(input  logic [2:0] moves,
 	end
 	
 endmodule
-
-module matchAllowedMoves(input  logic [4:0]	selectedPiece	//finish cases for if it matches or not
+//not finished
+module matchAllowedMoves(input  logic [4:0]	selectedPiece,	//finish cases for if it matches or not
 			 input  logic [23:0]	moves,
+			 input	logic [2:0]	originalRow, originalColumn, placedRow, placedColumn,
 			 output logic		match);
 
 	always_comb	begin
@@ -147,7 +148,7 @@ module matchAllowedMoves(input  logic [4:0]	selectedPiece	//finish cases for if 
 			5'b????0:	match = 0;
 			5'b000??:	match = 0;
 			5'b001?1:	begin
-				p
+				pawnMatch pawnM(moves[2:0], )
 			end
 			5'b010?1:	begin
 				selectedPiece = 5'b0;
