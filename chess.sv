@@ -1,5 +1,10 @@
-module chess(input  logic	clk, reset, 
-	     output logic	something);
+module chess(input  logic	clk, reset,
+	     input  logic [3:0]	cursor,
+	     output logic [6:0]	rowDisplay, columnDisplay,
+	     output logic	vgaclk,
+	     output logic	hsync, vsync,
+	     output logic	sync_b, blank_b
+	     output logic [7:0]	r, g, b);
 
 // boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
