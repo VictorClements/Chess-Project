@@ -89,25 +89,51 @@ module chess(input  logic	clk, reset,	//clk and reset for system
   logic [2:0] rowNum, columnNum;
   logic [4:0] boardPos [7:0][7:0];
   logic [23:0] moves;
-  initial $readmemb("start.txt", boardPos);
+  initial $readmemb("start.txt", boardPos);	// initialize boardPos array to starting chess piece placements
 	
-  positionCounter myPos(rowChange, columnChange, reset, UP, rowNum, columnNum, rowDisplay, columnDisplay);
-	//vga myvga(insert stuff here);  
-	always_ff @(posedge select) 	begin
-		selectedPiece <= boardPos[rowNum][columnNum][4:0];
-		originalRow <= rowNum;
-		originalColumn <= columnNum;
-		allowedMoves pieceMoves(selectedPiece, rowNum, columnNum, boardPos, moves);
+  positionCounter myPos(rowChange, columnChange, reset, UP, rowNum, columnNum, rowDisplay, columnDisplay);	// input for cursor
+	//vga myvga(insert stuff here);  //output for cga display
+	always_ff @(posedge select) 	begin	//when the select button is pressed
+		selectedPiece <= boardPos[rowNum][columnNum][4:0];	//assign selectedPiece the current position info
+		originalRow <= rowNum;					//record this original row
+		originalColumn <= columnNum;				//record this original column
+		allowedMoves pieceMoves(selectedPiece, rowNum, columnNum, boardPos, moves);	//instantiate allowedMoves to see what moves are allowed for this piece
 	end
 	
-	always_ff @(posedge place)	begin	
-		matchAllowedMoves match(selectedPiece, moves, match);
-		if(match) begin
-			boardPos[rowNum][columnNum][4:0] = selectedPiece;
-			boardPos[originalRow][origininalColumn][4:0] = 5'b0;
+	always_ff @(posedge place)	begin	//when the place button is pressed
+		matchAllowedMoves matches(selectedPiece, moves, match);		//instantiate matchAllowedMoves module to see if attempted move matches allowed moves
+		if(match) begin							//if match is true
+			boardPos[rowNum][columnNum][4:0] = selectedPiece;	//move piece to new position
+			boardPos[originalRow][origininalColumn][4:0] = 5'b0;	//reset original position to no picee
 		end
-		else	selectedPiece = 5'b0;		//remove the else case?
+		else	selectedPiece = 5'b0;		//otherwise reset to selected piece to 5'b0	//remove the else case?
 		selectedPiece = 5'b0;
+	end
+	
+endmodule
+
+module pawnMatch(input  logic [2:0] moves,
+		 input  logic	    color,
+		 input  logic [2:0] originalRow, originalColumn,
+		 input  logic [2:0] placedRow, Place Column,
+		 output logic	    match);
+	
+	always_comb	begin
+		case(color)	begin
+			1'b0:	begin
+				if( moves[0] & ( (placedRow - originalRow) == -1) & ( (placeColumn - originalColumn) == 1) ) 		match = 1;
+				else if( moves[1] & ( (placedRow - originalRow) == -1) & ( (placeColumn - originalColumn) == 0) )	match = 1;
+				else if( moves[2] & ( (placedRow - originalRow) == -1) & ( (placeColumn - originalColumn) == -1) )	match = 1;
+				else													match = 0;
+			end
+			1'b1:	begin
+				if( moves[0] & ( (placedRow - originalRow) == 1) & ( (placeColumn - originalColumn) == 1) ) 		match = 1;
+				else if( moves[1] & ( (placedRow - originalRow) == 1) & ( (placeColumn - originalColumn) == 0) )	match = 1;
+				else if( moves[2] & ( (placedRow - originalRow) == 1) & ( (placeColumn - originalColumn) == -1) )	match = 1;
+				else													match = 0;
+			end
+			default:	match = 1'b0;
+		endcase
 	end
 	
 endmodule
@@ -121,7 +147,7 @@ module matchAllowedMoves(input  logic [4:0]	selectedPiece	//finish cases for if 
 			5'b????0:	match = 0;
 			5'b000??:	match = 0;
 			5'b001?1:	begin
-				selectedPiece = 5'b0;
+				p
 			end
 			5'b010?1:	begin
 				selectedPiece = 5'b0;
