@@ -157,15 +157,14 @@ module videoGen(input  logic [9:0] x, y,
 	casez(positionInfo[4:2])
 	3'b000:		{r, b, g} = 24'hEEEED2;
 	3'b010:		{r, b, g} = 24'h444488;
-	3'b011:		{r, b, g} = 24'hFF0000;	//should make top left square red
+	3'b011:		{r, b, g} = 24'hFF0000;	//should make top left square red but doesnt work?
 	3'b001:		{r, b, g} = 24'hFF0000;	//same as above
 	3'b1??:		{r, b, g} = 24'h000000;
 	default:	{r, b, g} = 24'h000000;
 	endcase
   end
   
-  //chargenrom chargenromb(y[8:3]+8'd65, x[2:0], y[2:0], pixel); 
-  //assign {r, b} = (y[3]==0) ? {{8{pixel}},8'h00} : {8'h00, {8{pixel}}}; 
+
   
   //assign {r, b, g} = (positionInfo[2] == 0) ? 24'hEEEED2 : 24'h769656;
 
@@ -174,6 +173,18 @@ module videoGen(input  logic [9:0] x, y,
 endmodule
 
 
+module pieceGen(input  logic [4:0] 	positionInfo,
+		output logic		pixel,
+		output logic 		colorOut);	//fix: output logic	colorOut //one bit only then you can do {24{color}}
+	
+  logic [49:0] piece[310:0];	// to hold piece sprites (file only actually has 300 lines)
+  initial $readmemb("pieces.txt", piece);
+	
+endmodule
+
+  //chargenrom chargenromb(y[8:3]+8'd65, x[2:0], y[2:0], pixel); 
+  //assign {r, b} = (y[3]==0) ? {{8{pixel}},8'h00} : {8'h00, {8{pixel}}}; 
+/*
 module chargenrom(input  logic [7:0] ch, 
                   input  logic [2:0] xoff, yoff,  
                   output logic       pixel); 
@@ -191,6 +202,7 @@ module chargenrom(input  logic [7:0] ch,
   assign pixel = line[3'd7-xoff]; 
   
 endmodule 
+*/
 
 module rectgen(input  logic [9:0] x, y, 
 			   input  logic [4:0] boardPos [7:0][7:0],
