@@ -71,6 +71,8 @@ always_ff @(posedge reset)	begin
 module chess(input  logic	clk, reset,	//clk and reset for system 
 	     input  logic 	rowChange, columnChange, //inputs from board from key buttons
 	     input  logic	UP,				//input from board from lever
+	     input  logic	select,				//input from board from key button to select a position
+	     input  logic	place,				//input from board from key button to place piece in position
 	     output logic [6:0]	rowDisplay, columnDisplay,	//output cursor position onto hex sevensegs
 	     output logic	vgaclk,				//vga output clk
 	     output logic	hsync, vsync,			//vga output horiz and vert sync
@@ -80,27 +82,72 @@ module chess(input  logic	clk, reset,	//clk and reset for system
 // boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
-// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 N/A	
+// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 No piece	
+  logic [4:0] selectedPiece;
   logic [2:0] rowNum, columnNum;
   logic [4:0] boardPos [7:0][7:0];
+  logic [23:0] moves;
   initial $readmemb("start.txt", boardPos);
 	
   positionCounter myPos(rowChange, columnChange, reset, UP, rowNum, columnNum, rowDisplay, columnDisplay);
-
+  
+	always_ff @(posedge select) 	begin
+		selectedPiece <= boardPos[rowNum][columnNum][4:0];
+		allowedMoves pieceMoves(selectedPiece, rowNum, columnNum, boardPos, moves);
+	end
+	
+	always_ff @(posedge place)	begin	
+		
+	end
+	
 endmodule
 
-module playerAllowedMoves(input  logic [4:0]  boardPos [7:0][7:0],
-			  output logic [2:0]  pawn1, pawn2, pawn3, pawn4, pawn5, pawn6, pawn7, pawn8,
-			  output logic [7:0]  knight1, knight2, king,
-			  output logic [11:0] bishop1, bishop2, rook1, rook2,
-			  output logic [23:0] queen);
+module allowedMoves(input  logic [4:0]  selectedPiece,
+		    input logic  [2:0]	rowNum, columnNum,
+		    input  logic [4:0]  boardPos[7:0][7:0],
+		    output logic [23:0] moves);
+	
+	always_comb	begin
+		casez(selectedPiece)	begin
+			5'b????0:	moves = 24'b0;
+			5'b000??:	moves = 24'b0;
+			5'b001?1:	begin
+				pawn(rowNum, columnNum, selectedPiece[1], boardPos, moves[2:0]);
+				moves[23:3] = 21'b0;
+			end
+			5'b010?1:	begin
+				knight(rowNum, columnNum, selectedPiece[1], boardPos, moves[7:0]);
+				moves[23:8] = 16'b0;
+			end
+			5'b011?1:	begin
+				bishop(rowNum, columnNum, selectedPiece[1], boardPos, moves[11:9], moves[8:6], moves[5:3], moves[2:0]);
+				moves[23:12] = 12'b0;
+			end
+			5'b100?1:	begin
+				rook(rowNum, columnNum, selectedPiece[1], boardPos, moves[11:9], moves[8:6], moves[5:3], moves[2:0]);
+				moves[23:12] = 12'b0;
+			end
+			5'b101?1:	begin
+				queen(rowNum, columnNum, selectedPiece[1], boardPos, moves[23:21], moves[20:18], moves[17:15], moves[14:12], moves[11:9], moves[8:6], moves[5:3], moves[2:0]);
+			end
+			5'b110?1:	begin
+				king(rowNum, columnNum, selectedPiece[1], boardPos, moves[7:0]);
+				moves[23:8] = 16'b0
+			end
+			default:	moves = 24'b0;
+		endcase
+	end
+			
+	
+endmodule
+
 
 	//pawn(i, j, boardPos[i][j][1], boardPos, )
 
 	//maybe replace with: for(logic [3:0] i = 4'b0; i < 4'd8; i + 1'b1) and for(logic [3:0] j = 4'b0; j < 4'd8; j + 1'b1)
-	
+/*	
   always_comb	begin
-	  for(int i = 0; i < 8; i++)	begin			
+    for(int i = 0; i < 8; i++)	begin			
       for(int j = 0; j < 8; j++)	begin
 	casez(boardPos[i][j][4:0])	begin
 	  5'b????0:	// Empty
@@ -114,9 +161,10 @@ module playerAllowedMoves(input  logic [4:0]  boardPos [7:0][7:0],
       end
     end
   end
+*/
 
-endmodule
-		
+
+
 //my current solution is to do something that seems like it would be a huge waste of space:
 /*
 module playerAllowedMoves(input  logic [4:0]    boardPos [7:0][7:0],
