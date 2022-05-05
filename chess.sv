@@ -1,18 +1,4 @@
-module chess(input  logic	clk, reset,
-	     input  logic [3:0]	cursor,
-	     output logic [6:0]	rowDisplay, columnDisplay,
-	     output logic	vgaclk,
-	     output logic	hsync, vsync,
-	     output logic	sync_b, blank_b
-	     output logic [7:0]	r, g, b);
-
-// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
-// bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
-// bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
-// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 N/A
-
-	logic [4:0] boardPos [7:0][7:0];
-	
+/* possible replacement for the inital for array very long but not sure if inital block will actually work
 always_ff @(posedge reset)	begin
 	  boardPos[0][0][4:0] <= 5'b10011;	//Black rook
 	  boardPos[0][1][4:0] <= 5'b01011;	//Black knight
@@ -79,6 +65,24 @@ always_ff @(posedge reset)	begin
 	  boardPos[7][6][4:0] <= 5'b01001;	//White Knight
 	  boardPos[7][7][4:0] <= 5'b10001;	//White rook
 	end
+
+*/
+
+module chess(input  logic	clk, reset,
+	     input  logic [3:0]	cursor,
+	     output logic [6:0]	rowDisplay, columnDisplay,
+	     output logic	vgaclk,
+	     output logic	hsync, vsync,
+	     output logic	sync_b, blank_b
+	     output logic [7:0]	r, g, b);
+
+// boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
+// bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
+// bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
+// bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 N/A
+
+  logic [4:0] boardPos [7:0][7:0];
+  initial $readmemb("start.txt", boardPos);
 
 endmodule
 
