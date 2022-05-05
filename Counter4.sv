@@ -1,8 +1,10 @@
 module Counter4(input  logic 		clk,
 				input  logic 		reset,
 				input  logic 		UP,
-				output logic [3:0]	q,
+				output logic [2:0]	numOut,
 				output logic [6:0]	mySegs);
+					
+	logic [3:0] q;				
 					
 	always_ff @(posedge clk, posedge reset/*, posedge something*/) begin
 		if (reset)   q <= 0;          // when reset is high, set signal to 1
@@ -19,6 +21,8 @@ module Counter4(input  logic 		clk,
 			endcase
 		end
 	end
+	
+	assign numOut = q[2:0];
 	
 	sevenseg display(q, mySegs);
 	
