@@ -115,29 +115,89 @@ endmodule
 module pawnMatch(input  logic [2:0] moves,
 		 input  logic	    color,
 		 input  logic [2:0] originalRow, originalColumn,
-		 input  logic [2:0] placedRow, Place Column,
+		 input  logic [2:0] placedRow, placedColumn,
 		 output logic	    match);
 	
 	always_comb	begin
 		case(color)	begin
 			1'b0:	begin
-				if( moves[0] & ( (placedRow - originalRow) == -1) & ( (placeColumn - originalColumn) == 1) ) 		match = 1;
-				else if( moves[1] & ( (placedRow - originalRow) == -1) & ( (placeColumn - originalColumn) == 0) )	match = 1;
-				else if( moves[2] & ( (placedRow - originalRow) == -1) & ( (placeColumn - originalColumn) == -1) )	match = 1;
-				else													match = 0;
+				if( moves[0] & ((placedRow + 1) == originalRow) & (placedColumn == (originalColumn + 1)) ) 	match = 1;
+				else if( moves[1] & ((placedRow + 1) == originalRow) & (placedColumn == originalColumn) )	match = 1;
+				else if( moves[2] & ((placedRow + 1) == originalRow) & ((placedColumn + 1) == originalColumn)	match = 1;
+				else												match = 0;
 			end
 			1'b1:	begin
-				if( moves[0] & ( (placedRow - originalRow) == 1) & ( (placeColumn - originalColumn) == 1) ) 		match = 1;
-				else if( moves[1] & ( (placedRow - originalRow) == 1) & ( (placeColumn - originalColumn) == 0) )	match = 1;
-				else if( moves[2] & ( (placedRow - originalRow) == 1) & ( (placeColumn - originalColumn) == -1) )	match = 1;
-				else													match = 0;
+				if( moves[0] & (placedRow == (originalRow + 1)) & (placedColumn == (originalColumn + 1)) ) 	match = 1;
+				else if( moves[1] & (placedRow == (originalRow + 1)) & (placedColumn == originalColumn) )	match = 1;
+				else if( moves[2] & (placedRow == (originalRow + 1)) & ((placedColumn + 1) == originalColumn) )	match = 1;
+				else												match = 0;
 			end
 			default:	match = 1'b0;
 		endcase
 	end
 	
 endmodule
-//not finished
+					
+module knightMatch(input  logic [7:0] moves,
+		   input  logic	      color,
+		   input  logic [2:0] originalRow, originalColumn,
+		   input  logic [2:0] placedRow, placedColumn,
+		   output logic	      match);
+	
+	always_comb	begin
+		
+	end
+	
+endmodule
+
+module bishopMatch(input  logic [7:0] moves,
+		   input  logic	      color,
+		   input  logic [2:0] originalRow, originalColumn,
+		   input  logic [2:0] placedRow, placedColumn,
+		   output logic	      match);
+	
+	always_comb	begin
+		
+	end
+	
+endmodule
+
+module rookMatch(input  logic [7:0] moves,
+		 input  logic	    color,
+		 input  logic [2:0] originalRow, originalColumn,
+		 input  logic [2:0] placedRow, placedColumn,
+		 output logic	    match);
+	
+	always_comb	begin
+		
+	end
+	
+endmodule
+					
+module queenMatch(input  logic [7:0] moves,
+		  input  logic	     color,
+		  input  logic [2:0] originalRow, originalColumn,
+		  input  logic [2:0] placedRow, placedColumn,
+		  output logic	     match);
+	
+	always_comb	begin
+		
+	end
+	
+endmodule
+					
+module kingMatch(input  logic [7:0] moves,
+		 input  logic	    color,
+		 input  logic [2:0] originalRow, originalColumn,
+		 input  logic [2:0] placedRow, placedColumn,
+		 output logic	    match);
+	
+	always_comb	begin
+		
+	end
+	
+endmodule
+					
 module matchAllowedMoves(input  logic [4:0]	selectedPiece,	//finish cases for if it matches or not
 			 input  logic [23:0]	moves,
 			 input	logic [2:0]	originalRow, originalColumn, placedRow, placedColumn,
@@ -147,24 +207,12 @@ module matchAllowedMoves(input  logic [4:0]	selectedPiece,	//finish cases for if
 		casez(selectedPiece)	begin
 			5'b????0:	match = 0;
 			5'b000??:	match = 0;
-			5'b001?1:	begin
-				pawnMatch pawnM(moves[2:0], )
-			end
-			5'b010?1:	begin
-				selectedPiece = 5'b0;
-			end
-			5'b011?1:	begin
-				selectedPiece = 5'b0;
-			end
-			5'b100?1:	begin
-				selectedPiece = 5'b0;
-			end
-			5'b101?1:	begin
-				selectedPiece = 5'b0;
-			end
-			5'b110?1:	begin
-				selectedPiece = 5'b0;
-			end
+			5'b001?1:	pawnMatch pawnM(moves[2:0], selectedPiece[1], originalRow, originalColumn, placedRow, placedColumn, match);
+			5'b010?1:	knightMatch knightM(moves[7:0], selectedPiece[1], originalRow, originalColumn, placedRow, placedColumn, match);
+			5'b011?1:	bishopMatch bishopM(moves[11:0], selectedPiece[1], originalRow, originalColumn, placedRow, placedColumn, match);
+			5'b100?1:	rookMatch rookM(moves[11:0], selectedPiece[1], originalRow, originalColumn, placedRow, placedColumn, match);
+			5'b101?1:	queenMatch queenM(moves[23:0], selectedPiece[1], originalRow, originalColumn, placedRow, placedColumn, match);
+			5'b110?1:	kingMatch kingM(moves[7:0], selectedPiece[1], originalRow, originalColumn, placedRow, placedColumn, match);
 			default:	match = 0;
 		endcase	
 	end	
