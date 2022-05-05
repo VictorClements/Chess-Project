@@ -83,6 +83,8 @@ module chess(input  logic	clk, reset,	//clk and reset for system
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
 // bit 1 represents the color of the piece on the space, no piece = 0 (default),  white = 0, black = 1
 // bits 4:2 represents piece type 001 Pawn, 010 knight, 011 bishop, 100 rook, 101 queen, 110 king, 000 No piece	
+  logic	      match;
+  logic [2:0] originalRow, originalColumn
   logic [4:0] selectedPiece;
   logic [2:0] rowNum, columnNum;
   logic [4:0] boardPos [7:0][7:0];
@@ -90,16 +92,55 @@ module chess(input  logic	clk, reset,	//clk and reset for system
   initial $readmemb("start.txt", boardPos);
 	
   positionCounter myPos(rowChange, columnChange, reset, UP, rowNum, columnNum, rowDisplay, columnDisplay);
-  
+	//vga myvga(insert stuff here);  
 	always_ff @(posedge select) 	begin
 		selectedPiece <= boardPos[rowNum][columnNum][4:0];
+		originalRow <= rowNum;
+		originalColumn <= columnNum;
 		allowedMoves pieceMoves(selectedPiece, rowNum, columnNum, boardPos, moves);
 	end
 	
 	always_ff @(posedge place)	begin	
-		
+		matchAllowedMoves match(selectedPiece, moves, match);
+		if(match) begin
+			boardPos[rowNum][columnNum][4:0] = selectedPiece;
+			boardPos[originalRow][origininalColumn][4:0] = 5'b0;
+		end
+		else	selectedPiece = 5'b0;		//remove the else case?
+		selectedPiece = 5'b0;
 	end
 	
+endmodule
+
+module matchAllowedMoves(input  logic [4:0]	selectedPiece	//finish cases for if it matches or not
+			 input  logic [23:0]	moves,
+			 output logic		match);
+
+	always_comb	begin
+		casez(selectedPiece)	begin
+			5'b????0:	match = 0;
+			5'b000??:	match = 0;
+			5'b001?1:	begin
+				selectedPiece = 5'b0;
+			end
+			5'b010?1:	begin
+				selectedPiece = 5'b0;
+			end
+			5'b011?1:	begin
+				selectedPiece = 5'b0;
+			end
+			5'b100?1:	begin
+				selectedPiece = 5'b0;
+			end
+			5'b101?1:	begin
+				selectedPiece = 5'b0;
+			end
+			5'b110?1:	begin
+				selectedPiece = 5'b0;
+			end
+			default:	match = 0;
+		endcase	
+	end	
 endmodule
 
 module allowedMoves(input  logic [4:0]  selectedPiece,
