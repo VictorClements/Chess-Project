@@ -1,5 +1,5 @@
 module chess(input  logic	clk, reset, 
-			 output logic	something);
+	     output logic	something);
 
 // boardPos is a 2-D array with 8 rows and 8 columns, and each element of the array is a 5 bit value
 // bit 0 represents if the space is empty (no piece on the space) space is occuped = 1 and space is empty = 0
@@ -77,5 +77,54 @@ always_ff @(posedge reset)	begin
 
 endmodule
 
-module FindBlacksMoves(input  logic [4:0] boardPos [7:0][7:0]
-					   output logic )
+module playerAllowedMoves(input  logic [4:0]  boardPos [7:0][7:0],
+			  output logic [2:0]  pawn1, pawn2, pawn3, pawn4, pawn5, pawn6, pawn7, pawn8,
+			  output logic [7:0]  knight1, knight2, king,
+			  output logic [11:0] bishop1, bishop2, rook1, rook2,
+			  output logic [23:0] queen);
+
+	//pawn(i, j, boardPos[i][j][1], boardPos, )
+
+	//maybe replace with: for(logic [3:0] i = 4'b0; i < 4'd8; i + 1'b1) and for(logic [3:0] j = 4'b0; j < 4'd8; j + 1'b1)
+	
+  always_comb	begin
+	  for(int i = 0; i < 8; i++)	begin			
+      for(int j = 0; j < 8; j++)	begin
+	casez(boardPos[i][j][4:0])	begin
+	  5'b????0:	// Empty
+	  5'b001?1:	// Pawn
+	  5'b100?1:	// Rook
+	  5'b010?1:	// Knight
+	  5'b011?1:	// Bishop
+	  5'b101?1:	// Queen
+	  default:
+	endcase
+      end
+    end
+  end
+
+endmodule
+		
+//my current solution is to do something that seems like it would be a huge waste of space:
+/*
+module playerAllowedMoves(input  logic [4:0]    boardPos [7:0][7:0],
+			  output logic [1535:0] moves);
+			  
+  always_comb	begin
+	  for(int i = 0; i < 8; i++)	begin			
+      for(int j = 0; j < 8; j++)	begin
+	casez(boardPos[i][j][4:0])	begin
+	  5'b????0:	// Empty
+	  5'b001?1:	pawn	p(i, j, boardPos[i][j][1], boardPos, moves[( (j + 8*i)*24 + 2 ):( (j + 8*i)*24 )]	// Pawn
+	  5'b100?1:	rook	r(i, j, boardPos[i][j][1], boardPos, moves[( (j + 8*i)*24 + 11 ):( (j + 8*i)*24 )]	// Rook
+	  5'b010?1:	knight	n(i, j, boardPos[i][j][1], boardPos, moves[( (j + 8*i)*24 + 7 ):( (j + 8*i)*24 )]	// Knight
+	  5'b011?1:	bishop	b(i, j, boardPos[i][j][1], boardPos, moves[( (j + 8*i)*24 + 11 ):( (j + 8*i)*24 )]	// Bishop
+	  5'b101?1:	queen	q(i, j, boardPos[i][j][1], boardPos, moves[( (j + 8*i)*24 + 23 ):( (j + 8*i)*24 )]	// Queen
+	  5'b110?1:	king	k(i, j, boardPos[i][j][1], boardPos, moves[( (j + 8*i)*24 + 7 ):( (j + 8*i)*24 )]	// King
+	  default:
+	endcase
+      end
+    end
+  end
+endmodule
+*/
