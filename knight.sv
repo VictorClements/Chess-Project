@@ -22,7 +22,7 @@ module knight(input  logic [2:0] row,
 			  input  logic [2:0] column,
 			  input  logic 	     color,
 			  input  logic [2:0] boardPos [7:0][7:0],
-			  output logic [2:0] pawnAllow);
+			  output logic [7:0] knightAllow);
 
 //start
 always_comb		begin
