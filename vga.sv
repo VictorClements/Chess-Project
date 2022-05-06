@@ -77,24 +77,30 @@ endmodule
 
 
 module videoGen(input  logic [9:0] x, y,
-				input  logic [2:0] boardPos [7:0][7:0],
-				output logic [7:0] r, g, b); 
+		input  logic [2:0] boardPos [7:0][7:0],
+		output logic [7:0] r, g, b); 
 
-  logic pixel, inrect; 
-  logic [4:0] positionInfo;
+  logic pixel, colorOut; 
+  logic [11:0] positionInfo;
   // given y position, choose a character to display 
   // then look up the pixel value from the character ROM 
   // and display it in red or blue. Also draw a green rectangle. 
     rectgen rectgen(x, y, boardPos, positionInfo); 
   
   always_comb	begin
-	casez(positionInfo[4:2])
-	3'b000:		{r, b, g} = 24'hEEEED2;
-	3'b010:		{r, b, g} = 24'h444488;
-	3'b011:		{r, b, g} = 24'hFF0000;	//should make top left square red but doesnt work?
-	3'b001:		{r, b, g} = 24'hFF0000;	//same as above
-	3'b1??:		{r, b, g} = 24'h000000;
-	default:	{r, b, g} = 24'h000000;
+	  casez({positionInfo[11:10], positionInfo[6]})
+	3'b00?:		begin
+		{r, g, b} = 24'hEEEED2;
+		pieceGen(positionInfo, pixel, colorOut);
+		{r, g, b} = (pixel) ? {24{~positionInfo[6]}} : 24'hEEEED2;
+	end
+	3'b01?:		begin
+		{r, g, b} = 24'h448844;
+		pieceGen(positionInfo, pixel, colorOut);
+		{r, g, b} = (pixel) ? {24{~positionInfo[6]}} : 24'h448844;
+	end
+	3'b1??:		{r, g, b} = 24'h000000;
+	default:	{r, g, b} = 24'h000000;
 	endcase
   end
   
@@ -107,12 +113,35 @@ module videoGen(input  logic [9:0] x, y,
 endmodule
 
 
-module pieceGen(input  logic [4:0] 	positionInfo,
+module pieceGen(input  logic [11:0] 	positionInfo,	//[11:10] square color 00 white, 01 black, other = not on board. [9:7] piece type, [6] color, [5:0] row and column
 		output logic		pixel,
 		output logic 		colorOut);	//fix: output logic	colorOut //one bit only then you can do {24{color}}
 	
   logic [49:0] piece[310:0];	// to hold piece sprites (file only actually has 300 lines)
   initial $readmemb("pieces.txt", piece);
+	
+	always_comb	begin
+		case(positionInfo[9:7])
+			3'b001:		begin	
+				//something
+			end
+			3'b010:		begin	
+				//something
+			end
+			3'b011:		begin	
+				//something
+			end
+			3'b100:		begin	
+				//something
+			end
+			3'b101:		begin	
+				//something
+			end
+			3'b110:		begin	
+				//something
+			end
+			default:	pixel = 1'b0;
+	endcase
 	
 endmodule
 
@@ -139,146 +168,146 @@ endmodule
 */
 
 module rectgen(input  logic [9:0] x, y, 
-			   input  logic [4:0] boardPos [7:0][7:0],
-			   output logic [4:0] positionInfo);
+	       input  logic [4:0] boardPos [7:0][7:0],
+	       output logic [11:0] positionInfo);	//first two bits say square color, next 4 bits are piece type and piece color, last 6 bits are row and column
 			   
  always_comb	begin
 		//first row
 		if( (x >= 80) & (x < 140) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b00, boardPos[0][0][4:2]};
+			positionInfo = {2'b00, boardPos[0][0][4:1], 3'd0, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b01, boardPos[0][1][4:2]};
+			positionInfo = {2'b01, boardPos[0][1][4:1], 3'd0, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b00, boardPos[0][2][4:2]};
+			positionInfo = {2'b00, boardPos[0][2][4:1], 3'd0, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b01, boardPos[0][3][4:2]};
+			positionInfo = {2'b01, boardPos[0][3][4:1], 3'd0, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b00, boardPos[0][4][4:2]};
+			positionInfo = {2'b00, boardPos[0][4][4:1], 3'd0, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b01, boardPos[0][5][4:2]};
+			positionInfo = {2'b01, boardPos[0][5][4:1], 3'd0, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b00, boardPos[0][6][4:2]};
+			positionInfo = {2'b00, boardPos[0][6][4:1], 3'd0, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 0) & (y < 60) )
-			positionInfo = {2'b01, boardPos[0][7][4:2]};
+			positionInfo = {2'b01, boardPos[0][7][4:1], 3'd0, 3'd7};
 		//second row
 		else if( (x >= 80) & (x < 140) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b01, boardPos[1][0][4:2]};
+			positionInfo = {2'b01, boardPos[1][0][4:1], 3'd1, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b00, boardPos[1][1][4:2]};
+			positionInfo = {2'b00, boardPos[1][1][4:1], 3'd1, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b01, boardPos[1][2][4:2]};
+			positionInfo = {2'b01, boardPos[1][2][4:1], 3'd1, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b00, boardPos[1][3][4:2]};
+			positionInfo = {2'b00, boardPos[1][3][4:1], 3'd1, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b01, boardPos[1][4][4:2]};
+			positionInfo = {2'b01, boardPos[1][4][4:1], 3'd1, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b00, boardPos[1][5][4:2]};
+			positionInfo = {2'b00, boardPos[1][5][4:1], 3'd1, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b01, boardPos[1][6][4:2]};
+			positionInfo = {2'b01, boardPos[1][6][4:1], 3'd1, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 60) & (y < 120) )
-			positionInfo = {2'b00, boardPos[1][7][4:2]};
+			positionInfo = {2'b00, boardPos[1][7][4:1], 3'd1, 3'd7};
 		//third row
 		else if( (x >= 80) & (x < 140) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b00, boardPos[2][0][4:2]};
+			positionInfo = {2'b00, boardPos[2][0][4:1], 3'd2, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b01, boardPos[2][1][4:2]};
+			positionInfo = {2'b01, boardPos[2][1][4:1], 3'd2, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b00, boardPos[2][2][4:2]};
+			positionInfo = {2'b00, boardPos[2][2][4:1], 3'd2, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b01, boardPos[2][3][4:2]};
+			positionInfo = {2'b01, boardPos[2][3][4:1], 3'd2, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b00, boardPos[2][4][4:2]};
+			positionInfo = {2'b00, boardPos[2][4][4:1], 3'd2, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b01, boardPos[2][5][4:2]};
+			positionInfo = {2'b01, boardPos[2][5][4:1], 3'd2, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b00, boardPos[2][6][4:2]};
+			positionInfo = {2'b00, boardPos[2][6][4:1], 3'd2, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 120) & (y < 180) )
-			positionInfo = {2'b01, boardPos[2][7][4:2]};
+			positionInfo = {2'b01, boardPos[2][7][4:1], 3'd2, 3'd7};
 		//fouth row
 		else if( (x >= 80) & (x < 140) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b01, boardPos[3][0][4:2]};
+			positionInfo = {2'b01, boardPos[3][0][4:1], 3'd3, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b00, boardPos[3][1][4:2]};
+			positionInfo = {2'b00, boardPos[3][1][4:1], 3'd3, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b01, boardPos[3][2][4:2]};
+			positionInfo = {2'b01, boardPos[3][2][4:1], 3'd3, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b00, boardPos[3][3][4:2]};
+			positionInfo = {2'b00, boardPos[3][3][4:1], 3'd3, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b01, boardPos[3][4][4:2]};
+			positionInfo = {2'b01, boardPos[3][4][4:1], 3'd3, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b00, boardPos[3][5][4:2]};
+			positionInfo = {2'b00, boardPos[3][5][4:1], 3'd3, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b01, boardPos[3][6][4:2]};
+			positionInfo = {2'b01, boardPos[3][6][4:1], 3'd3, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 180) & (y < 240) )
-			positionInfo = {2'b00, boardPos[3][7][4:2]};
+			positionInfo = {2'b00, boardPos[3][7][4:1], 3'd3, 3'd7};
 		//fifth row
 		else if( (x >= 80) & (x < 140) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b00, boardPos[4][0][4:2]};
+			positionInfo = {2'b00, boardPos[4][0][4:1], 3'd4, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b01, boardPos[4][1][4:2]};
+			positionInfo = {2'b01, boardPos[4][1][4:1], 3'd4, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b00, boardPos[4][2][4:2]};
+			positionInfo = {2'b00, boardPos[4][2][4:1], 3'd4, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b01, boardPos[4][3][4:2]};
+			positionInfo = {2'b01, boardPos[4][3][4:1], 3'd4, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b00, boardPos[4][4][4:2]};
+			positionInfo = {2'b00, boardPos[4][4][4:1], 3'd4, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b01, boardPos[4][5][4:2]};
+			positionInfo = {2'b01, boardPos[4][5][4:1], 3'd4, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b00, boardPos[4][6][4:2]};
+			positionInfo = {2'b00, boardPos[4][6][4:1], 3'd4, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 240) & (y < 300) )
-			positionInfo = {2'b01, boardPos[4][7][4:2]};
+			positionInfo = {2'b01, boardPos[4][7][4:1], 3'd4, 3'd7};
 		//sixth row
 		else if( (x >= 80) & (x < 140) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b01, boardPos[5][0][4:2]};
+			positionInfo = {2'b01, boardPos[5][0][4:1], 3'd5, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b00, boardPos[5][1][4:2]};
+			positionInfo = {2'b00, boardPos[5][1][4:1], 3'd5, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b01, boardPos[5][2][4:2]};
+			positionInfo = {2'b01, boardPos[5][2][4:1], 3'd5, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b00, boardPos[5][3][4:2]};
+			positionInfo = {2'b00, boardPos[5][3][4:1], 3'd5, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b01, boardPos[5][4][4:2]};
+			positionInfo = {2'b01, boardPos[5][4][4:1], 3'd5, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b00, boardPos[5][5][4:2]};
+			positionInfo = {2'b00, boardPos[5][5][4:1], 3'd5, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b01, boardPos[5][6][4:2]};
+			positionInfo = {2'b01, boardPos[5][6][4:1], 3'd5, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 300) & (y < 360) )
-			positionInfo = {2'b00, boardPos[5][7][4:2]};
+			positionInfo = {2'b00, boardPos[5][7][4:1], 3'd5, 3'd7};
 		//seventh row
 		else if( (x >= 80) & (x < 140) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b00, boardPos[6][0][4:2]};
+			positionInfo = {2'b00, boardPos[6][0][4:1], 3'd6, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b01, boardPos[6][1][4:2]};
+			positionInfo = {2'b01, boardPos[6][1][4:1], 3'd6, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b00, boardPos[6][2][4:2]};
+			positionInfo = {2'b00, boardPos[6][2][4:1], 3'd6, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b01, boardPos[6][3][4:2]};
+			positionInfo = {2'b01, boardPos[6][3][4:1], 3'd6, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b00, boardPos[6][4][4:2]};
+			positionInfo = {2'b00, boardPos[6][4][4:1], 3'd6, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b01, boardPos[6][5][4:2]};
+			positionInfo = {2'b01, boardPos[6][5][4:1], 3'd6, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b00, boardPos[6][6][4:2]};
+			positionInfo = {2'b00, boardPos[6][6][4:1], 3'd6, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 360) & (y < 420) )
-			positionInfo = {2'b01, boardPos[6][7][4:2]};
+			positionInfo = {2'b01, boardPos[6][7][4:1], 3'd6, 3'd7};
 		//eighth row4
 		else if( (x >= 80) & (x < 140) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b01, boardPos[7][0][4:2]};
+			positionInfo = {2'b01, boardPos[7][0][4:1], 3'd7, 3'd0};
 		else if( (x >= 140) & (x < 200) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b00, boardPos[7][1][4:2]};
+			positionInfo = {2'b00, boardPos[7][1][4:1], 3'd7, 3'd1};
 		else if( (x >= 200) & (x < 260) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b01, boardPos[7][2][4:2]};
+			positionInfo = {2'b01, boardPos[7][2][4:1], 3'd7, 3'd2};
 		else if( (x >= 260) & (x < 320) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b00, boardPos[7][3][4:2]};
+			positionInfo = {2'b00, boardPos[7][3][4:1], 3'd7, 3'd3};
 		else if( (x >= 320) & (x < 380) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b01, boardPos[7][4][4:2]};
+			positionInfo = {2'b01, boardPos[7][4][4:1], 3'd7, 3'd4};
 		else if( (x >= 380) & (x < 440) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b00, boardPos[7][5][4:2]};
+			positionInfo = {2'b00, boardPos[7][5][4:1], 3'd7, 3'd5};
 		else if( (x >= 440) & (x < 500) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b01, boardPos[7][6][4:2]};
+			positionInfo = {2'b01, boardPos[7][6][4:1], 3'd7, 3'd6};
 		else if( (x >= 500) & (x < 560) & (y >= 420) & (y < 480) )
-			positionInfo = {2'b00, boardPos[7][7][4:2]};
+			positionInfo = {2'b00, boardPos[7][7][4:1], 3'd7, 3'd7};
 		//when out of x and y bounds
 		else
 			positionInfo = 5'b11000;
