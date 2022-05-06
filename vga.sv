@@ -80,7 +80,7 @@ module videoGen(input  logic [9:0] x, y,
 		input  logic [2:0] boardPos [7:0][7:0],
 		output logic [7:0] r, g, b); 
 
-  logic pixel, colorOut; 
+  logic pixel; 
   logic [11:0] positionInfo;
   // given y position, choose a character to display 
   // then look up the pixel value from the character ROM 
@@ -91,12 +91,12 @@ module videoGen(input  logic [9:0] x, y,
 	  casez({positionInfo[11:10], positionInfo[6]})
 	3'b00?:		begin
 		{r, g, b} = 24'hEEEED2;
-		pieceGen(x, y, positionInfo, pixel, colorOut);
+		pieceGen(x, y, positionInfo, pixel);
 		{r, g, b} = (pixel) ? {24{~positionInfo[6]}} : 24'hEEEED2;
 	end
 	3'b01?:		begin
 		{r, g, b} = 24'h448844;
-		pieceGen(x, y, positionInfo, pixel, colorOut);
+		pieceGen(x, y, positionInfo, pixel);
 		{r, g, b} = (pixel) ? {24{~positionInfo[6]}} : 24'h448844;
 	end
 	3'b1??:		{r, g, b} = 24'h000000;
@@ -115,31 +115,37 @@ endmodule
 
 module pieceGen(input  logic [9:0]	x, y,
 		input  logic [11:0] 	positionInfo,	//[11:10] square color 00 white, 01 black, other = not on board. [9:7] piece type, [6] color, [5:0] row and column
-		output logic		pixel,
-		output logic 		colorOut);	//fix: output logic	colorOut //one bit only then you can do {24{color}}
+		output logic		pixel);	
 	
   logic [49:0] piece[310:0];	// to hold piece sprites (file only actually has 300 lines)
+  logic [49:0] line		// hold a line of sprite
   initial $readmemb("pieces.txt", piece);
 	
 	always_comb	begin
 		case(positionInfo[9:7])
-			3'b001:		begin	
-				//something
+			3'b001:		begin
+				line = piece[y%50];
+				pixel = line[x%50];
 			end
 			3'b010:		begin	
-				//something
+				line = piece[y%50 + 50];
+				pixel = line[x%50];
 			end
 			3'b011:		begin	
-				//something
+				line = piece[y%50 + 100];
+				pixel = line[x%50];
 			end
 			3'b100:		begin	
-				//something
+				line = piece[y%50 + 150];
+				pixel = line[x%50];
 			end
 			3'b101:		begin	
-				//something
+				line = piece[y%50 + 200];
+				pixel = line[x%50];
 			end
 			3'b110:		begin	
-				//something
+				line = piece[y%50 + 250];
+				pixel = line[x%50];
 			end
 			default:	pixel = 1'b0;
 	endcase
