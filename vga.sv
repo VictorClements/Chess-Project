@@ -118,7 +118,7 @@ module pieceGen(input  logic [9:0]	x, y,
 		output logic		pixel);	
 	
   logic [49:0] piece[310:0];	// to hold piece sprites (file only actually has 300 lines)
-  logic [49:0] line		// hold a line of sprite
+  logic [49:0] line;		// hold a line of sprite
   initial $readmemb("pieces.txt", piece);
 	
 	always_comb	begin
@@ -148,7 +148,8 @@ module pieceGen(input  logic [9:0]	x, y,
 				pixel = line[x%50];
 			end
 			default:	pixel = 1'b0;
-	endcase
+		endcase
+	end
 	
 endmodule
 
