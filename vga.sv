@@ -91,12 +91,12 @@ module videoGen(input  logic [9:0] x, y,
 	  casez({positionInfo[11:10], positionInfo[6]})
 	3'b00?:		begin
 		{r, g, b} = 24'hEEEED2;
-		pieceGen(positionInfo, pixel, colorOut);
+		pieceGen(x, y, positionInfo, pixel, colorOut);
 		{r, g, b} = (pixel) ? {24{~positionInfo[6]}} : 24'hEEEED2;
 	end
 	3'b01?:		begin
 		{r, g, b} = 24'h448844;
-		pieceGen(positionInfo, pixel, colorOut);
+		pieceGen(x, y, positionInfo, pixel, colorOut);
 		{r, g, b} = (pixel) ? {24{~positionInfo[6]}} : 24'h448844;
 	end
 	3'b1??:		{r, g, b} = 24'h000000;
@@ -113,7 +113,8 @@ module videoGen(input  logic [9:0] x, y,
 endmodule
 
 
-module pieceGen(input  logic [11:0] 	positionInfo,	//[11:10] square color 00 white, 01 black, other = not on board. [9:7] piece type, [6] color, [5:0] row and column
+module pieceGen(input  logic [9:0]	x, y,
+		input  logic [11:0] 	positionInfo,	//[11:10] square color 00 white, 01 black, other = not on board. [9:7] piece type, [6] color, [5:0] row and column
 		output logic		pixel,
 		output logic 		colorOut);	//fix: output logic	colorOut //one bit only then you can do {24{color}}
 	
